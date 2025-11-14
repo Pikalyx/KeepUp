@@ -1,0 +1,75 @@
+SWE Project Timeline
+Created 9/4/25 by: Noah (Master of Scrums)
+DISCLAIMER: This is subject to change. Ideas/timelines may shift!!
+
+Specific Requirements: (I’ll ask him specifically in an appointment)
+
+Basic Idea: We are aiming to create basic, personalized accounting software used to handle basic day-to-day bookkeeping, creating financial reports that are constantly updated with new entries into the database.
+
+Target Audience: Small Businesses
+
+Coding Languages Used:
+Python
+SQL
+HTML + CSS
+
+Explanation (First draft): We are going to create a webpage where users can input their data into a general ledger. This data will then be scraped and put into a database. Python code will be used to make queries to the database and to do various calculations, including Gross and Net Profit Margin, EPS, Liquidity Ratios, Leverage Ratios, Return Ratios, and Efficiency Ratios. This info will be displayed for users to browse through. All of this would be updated each time a new entry goes into the general ledger. I’m proposing the idea of having an AI parse through the financial statements and offer ideas of how to be more money efficient. This would serve as the personalized part of the accounting software. Lastly, there would be a knowledge base page offering helpful advice on how to better understand bookkeeping, as well as a help section for users to better understand how to navigate the site.
+
+Prioritization Legend:
+(1)=First Priority	(2)=Second Priority	      (3)=Third Priority
+
+Core Functions: 
+HTML Webpage- Operating as our front-end for users to interact with daily (1)
+An Excel file or database containing all user data (decide this as a team) (1)
+A General Ledger (Used for recording transactions) (1)
+Various Financial Statements (IS, RE, BS, Statement of Cash Flows) (1)
+Basic Security Functions (1)
+Financial Feedback (Perhaps use AI to help out with this part?) (3)
+Knowledge Base (Personal Finance and Basic Bookkeeping) (2)
+
+Detailed Breakdown:
+Homepage:
+HTML Homepage where users can select what they want to see
+General Ledger Page:
+Design the DB schema first
+Design a page that resembles a general ledger (not finished yet)
+Financial Statements Page:
+Utilize a Python API (Handles and organizes requests from the front end to the back end) -> Creates a query to the SQL database, including a timeframe
+SQL handles all filtering, summing, grouping, and counting operations. Returns the specific dataset to the Python API
+Python does all of the higher-level organization and calculations. It formats this data into JSON and then sends it back to the front-end
+Display data for users to see in neat tables (formatting may be required)
+Knowledge base Page:
+Additional information about bookkeeping and finance terms
+All done in HTML
+
+Approximate timeline length: 11-12 Weeks (This puts us right at presentations)
+
+Timeline:
+Week 1: Prerequisites
+Objective: Learn as much as possible about every single part of this process!!
+
+Tasks:
+	Set up Git Repository
+Research Coding Topics: Prioritize your part first
+Git: 
+HTML/CSS: 
+SQL: 
+Python APIs (Flask or Django): 
+JSON (surface-level knowledge): 
+Research potential security ideas for the site and database
+
+Research Accounting Topics: Develop a base level of understanding
+Understand the purpose and practice of Financial Statements (IS, RE, BS, Statement of Cash Flows)
+Understand what a general ledger is
+Financial Ratios
+Gross Profit Margin
+Net Profit Margin
+EPS
+Liquidity Ratios
+Leverage Ratios
+Return Ratios
+Efficiency Ratios.
+	Next Meeting: 9/12/25
+
+I will have the doc finished by Sunday and finalized by next Wednesday, so be sure to come back and look at it before then!
+
