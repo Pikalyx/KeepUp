@@ -1,0 +1,398 @@
+<!-- Template and minor debugging provided by ChatGPT, tweaked by developer. -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Multi-Account General Ledger — Template</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#fff; --accent:#2563eb; --muted:#6b7280;
+    --success:#059669; --danger:#dc2626;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:linear-gradient(180deg,#eef2ff 0,#f6f8fb 100%);display:flex;gap:18px;padding:20px;box-sizing:border-box}
+  .app{display:flex;flex:1;gap:18px;min-height:500px}
+  .sidebar{width:300px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);}
+  .main{flex:1;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);overflow:auto;}
+  h2{margin:0 0 10px 0;font-size:18px}
+  .account-list{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;padding-right:6px}
+  .account-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;cursor:pointer}
+  .account-item button{background:transparent;border:0;color:var(--muted);cursor:pointer}
+  .account-item.active{background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.02));}
+  .controls{display:flex;gap:8px;margin-bottom:10px}
+  button.primary{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid #e6e9ef;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .ledger-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .ledger-table{width:100%;border-collapse:collapse}
+  .ledger-table th, .ledger-table td{padding:8px;border-bottom:1px solid #eef2ff;text-align:left;font-size:14px}
+  .ledger-table th{background:transparent;color:var(--muted);font-weight:600}
+  .text-right{text-align:right}
+  .small{font-size:13px;color:var(--muted)}
+  .form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  input[type="text"], input[type="date"], input[type="number"], select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;background:white;min-width:0}
+  .actions{display:flex;gap:8px;align-items:center}
+  .bal-pos{font-weight:700}
+  .export{background:#111827;color:white;padding:6px 10px;border-radius:8px;border:0;cursor:pointer}
+  .muted{color:var(--muted)}
+  footer.note{margin-top:14px;color:var(--muted);font-size:13px}
+  @media (max-width:900px){
+    body{padding:12px}
+    .sidebar{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="General Ledger">
+  <aside class="sidebar" aria-label="Accounts sidebar">
+    <h2>Accounts</h2>
+    <div class="controls">
+    </div>
+
+    <div class="account-list" id="accountsList" aria-live="polite"></div>
+
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <button class="ghost" id="renameAccountBtn">Rename</button>
+      <button class="ghost" id="deleteAccountBtn">Delete</button>
+      <button class="ghost" id="exportAllBtn">Export All CSV</button>
+    </div>
+
+    <footer class="note">Tip: Use the "Add Entry" form in main area to record debits/credits per account.</footer>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="ledger-header">
+      <div>
+        <h2 id="ledgerTitle">Select an account</h2>
+        <div class="small" id="ledgerSubtitle">No account selected</div>
+      </div>
+
+      <div class="actions">
+        <select id="accountFilter" style="min-width:160px"></select>
+        <button class="primary" id="addEntryToggle">Add Entry</button>
+        <button class="export" id="exportAccountBtn" title="Export current account to CSV">Export CSV</button>
+      </div>
+    </div>
+
+    <section id="addEntrySection" style="display:none;margin-bottom:12px">
+      <div style="background:#f8fafc;border-radius:10px;padding:12px">
+        <form id="entryForm" onsubmit="return false">
+          <div class="form-row">
+            <input type="date" id="entryDate" required />
+            <input type="text" id="entryDescription" placeholder="Description" style="flex:1" required />
+            <select id="entryAccountSelect" required></select>
+            <input type="number" id="entryDebit" min="0" step="0.01" placeholder="Debit" />
+            <input type="number" id="entryCredit" min="0" step="0.01" placeholder="Credit" />
+            <button class="primary" id="saveEntryBtn">Save</button>
+            <button class="ghost" id="clearEntryBtn" type="button">Clear</button>
+          </div>
+          <div class="small muted">Enter an amount in either Debit or Credit (not both). For split transactions, enter multiple lines (one per affected account).</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="ledgerSection" aria-live="polite">
+      <table class="ledger-table" id="ledgerTable" role="table" aria-label="Ledger">
+        <thead>
+          <tr>
+            <th style="width:120px">Date</th>
+            <th style="width:250px">Description</th>
+            <th style="width:140px">Debit</th>
+            <th style="width:140px">Credit</th>
+            <th style="width:140px" class="text-right">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody">
+          <tr><td colspan="5" class="small muted">No account selected</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<script>
+/*
+  Simple in-memory multi-account general ledger template.
+  - accounts: [{id, name, entries: [{date, desc, debit, credit, balance}], openingBalance}]
+  - Running balance is calculated on render (debit increases, credit decreases for asset/expense accounts).
+  - This template keeps things simple: it doesn't enforce account type (Asset/Liability/Equity/Revenue/Expense).
+    If needed, extend account objects with 'type' and adjust sign rules accordingly.
+*/
+
+// App state
+let accounts = [];
+let selectedAccountId = null;
+let nextAccountId = 1;
+
+// Helpers
+function $id(id){return document.getElementById(id)}
+function money(v){ return Number(v).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function findAccount(id){ return accounts.find(a => a.id === id) }
+
+// Create a few sample accounts to start
+function seed(){
+  createAccount("Cash");
+  createAccount("Accounts Recievable");
+  createAccount("Inventory");
+  createAccount("Accounts Payable");
+  createAccount("Common Stock");
+  createAccount("Retained Earnings");
+  createAccount("Rent Expense");
+  createAccount("Payroll Expense");
+  createAccount("Supplies Expense");
+  createAccount("Cost of Goods Sold");
+  createAccount("Sales Revenue");
+  createAccount("Service Revenue");
+
+
+  // addEntry(accounts[0].id, "2025-11-01", "Opening balance", 1200, 0);
+  // addEntry(accounts[1].id, "2025-11-01", "Opening balance", 5000, 0);
+  // sample transaction: cash sale
+  // addEntry(accounts[0].id, "2025-11-05", "Cash sale #001", 200, 0);
+  // addEntry(accounts[2].id, "2025-11-05", "Sale recorded", 0, 200);
+  renderAll();
+}
+
+// Account functions
+function createAccount(name, openingBalance = 0){
+  const acc = { id: nextAccountId++, name: name || `Account ${nextAccountId}`, entries: [], openingBalance: Number(openingBalance) || 0 }
+  accounts.push(acc);
+  // if opening balance non-zero, add an opening entry
+  if(acc.openingBalance){
+    acc.entries.push({ date: (new Date()).toISOString().slice(0,10), desc: "Opening balance", debit: acc.openingBalance>0 ? acc.openingBalance : 0, credit: acc.openingBalance<0 ? -acc.openingBalance : 0 });
+  }
+  selectedAccountId = acc.id;
+  renderAll();
+  return acc;
+}
+function renameAccount(id, newName){
+  const a = findAccount(id); if(!a) return;
+  a.name = newName;
+  renderAll();
+}
+function deleteAccount(id){
+  const idx = accounts.findIndex(a=>a.id===id);
+  if(idx===-1) return false;
+  if(!confirm(`Delete account "${accounts[idx].name}" and all its entries? This cannot be undone.`)) return false;
+  accounts.splice(idx,1);
+  selectedAccountId = accounts.length ? accounts[0].id : null;
+  renderAll();
+  return true;
+}
+
+// Entry functions
+function addEntry(accountId, date, desc, debit, credit){
+  const a = findAccount(accountId);
+  if(!a) return false;
+  debit = Number(debit) || 0; credit = Number(credit) || 0;
+  if(debit && credit){
+    // avoid both being filled for simple entries
+    console.warn("Both debit and credit have values: prefer only one per entry in this simple template.");
+  }
+  a.entries.push({ date: date || (new Date()).toISOString().slice(0,10), desc: desc || "", debit, credit });
+  // keep entries sorted by date ascending (stable)
+  a.entries.sort((x,y)=> x.date.localeCompare(y.date));
+  renderAll();
+  return true;
+}
+
+// Rendering
+function renderAll(){
+  renderAccountsList();
+  renderAccountSelects();
+  renderLedger();
+}
+
+function renderAccountsList(){
+  const container = $id("accountsList");
+  container.innerHTML = "";
+  for(const a of accounts){
+    const div = document.createElement("div");
+    div.className = "account-item" + (a.id === selectedAccountId ? " active": "");
+    div.setAttribute("data-id", a.id);
+    div.onclick = ()=>{ selectedAccountId = a.id; renderAll(); };
+    const left = document.createElement("div");
+    left.style.display = "flex"; left.style.flexDirection = "column";
+    const title = document.createElement("div"); title.textContent = a.name; title.style.fontWeight = 600;
+    const sub = document.createElement("div"); sub.className="small muted"; sub.textContent = `${a.entries.length} entries`;
+    left.appendChild(title); left.appendChild(sub);
+    const right = document.createElement("div");
+    const bal = calculateRunningBalances(a).slice(-1)[0] || 0;
+    const balEl = document.createElement("div"); balEl.className="small"; balEl.innerHTML = `<span class="bal-pos">${money(bal)}</span>`;
+    right.appendChild(balEl);
+    div.appendChild(left); div.appendChild(right);
+    container.appendChild(div);
+  }
+  // if empty show placeholder
+  if(accounts.length === 0){
+    container.innerHTML = '<div class="small muted">No accounts yet — create one above.</div>';
+    selectedAccountId = null;
+  }
+}
+
+function renderAccountSelects(){
+  const sel = $id("entryAccountSelect");
+  const filter = $id("accountFilter");
+  sel.innerHTML = ""; filter.innerHTML = "";
+  for(const a of accounts){
+    const opt = document.createElement("option"); opt.value = a.id; opt.textContent = a.name; sel.appendChild(opt);
+    const opt2 = opt.cloneNode(true); filter.appendChild(opt2);
+  }
+  // maintain selected account on selects
+  if(selectedAccountId) {
+    sel.value = selectedAccountId;
+    filter.value = selectedAccountId;
+  }
+}
+
+function calculateRunningBalances(account){
+  // Returns array of balances after each entry
+  // Simple rule: debit increases balance, credit decreases balance (suitable for Asset/Expense style)
+  let bal = 0;
+  const balances = [];
+  if(account.openingBalance) bal += account.openingBalance;
+  for(const e of account.entries){
+    bal += (Number(e.debit || 0) - Number(e.credit || 0));
+    balances.push(bal);
+  }
+  return balances;
+}
+
+function renderLedger(){
+  const titleEl = $id("ledgerTitle");
+  const subEl = $id("ledgerSubtitle");
+  const tbody = $id("ledgerBody");
+  tbody.innerHTML = "";
+  if(!selectedAccountId){
+    titleEl.textContent = "Select an account";
+    subEl.textContent = "No account selected";
+    tbody.innerHTML = '<tr><td colspan="5" class="small muted">No account selected</td></tr>';
+    return;
+  }
+  const a = findAccount(Number(selectedAccountId));
+  if(!a){
+    tbody.innerHTML = '<tr><td colspan="5" class="small muted">Account not found</td></tr>';
+    return;
+  }
+  titleEl.textContent = a.name;
+  subEl.textContent = `${a.entries.length} entries · Opening: ${money(a.openingBalance || 0)}`;
+
+  // Build rows with running balance
+  let bal = Number(a.openingBalance || 0);
+  if(a.entries.length === 0){
+    tbody.innerHTML = `<tr><td colspan="5" class="small muted">No entries yet for ${a.name} — add one using the form.</td></tr>`;
+    return;
+  }
+  for(const e of a.entries){
+    bal += (Number(e.debit || 0) - Number(e.credit || 0));
+    const tr = document.createElement("tr");
+    const dcell = document.createElement("td"); dcell.textContent = e.date || "";
+    const desc = document.createElement("td"); desc.textContent = e.desc || "";
+    const deb = document.createElement("td"); deb.textContent = e.debit ? money(e.debit) : "";
+    const cred = document.createElement("td"); cred.textContent = e.credit ? money(e.credit) : "";
+    const bcell = document.createElement("td"); bcell.className = "text-right"; bcell.textContent = money(bal);
+    tr.appendChild(dcell); tr.appendChild(desc); tr.appendChild(deb); tr.appendChild(cred); tr.appendChild(bcell);
+    tbody.appendChild(tr);
+  }
+}
+
+// UI wiring
+/*$id("createAccountBtn").addEventListener("click", ()=>{
+  const name = $id("newAccountName").value.trim();
+  createAccount(name || `Account ${nextAccountId}`);
+  $id("newAccountName").value = "";
+});*/
+$id("renameAccountBtn").addEventListener("click", ()=>{
+  if(!selectedAccountId){ alert("Select an account to rename."); return; }
+  const a = findAccount(Number(selectedAccountId));
+  const newName = prompt("Rename account:", a.name);
+  if(newName) renameAccount(a.id, newName.trim());
+});
+$id("deleteAccountBtn").addEventListener("click", ()=>{
+  if(!selectedAccountId){ alert("Select an account to delete."); return; }
+  deleteAccount(Number(selectedAccountId));
+});
+
+// Toggle add entry form
+$id("addEntryToggle").addEventListener("click", ()=>{
+  const sec = $id("addEntrySection");
+  sec.style.display = sec.style.display === "none" ? "block" : "none";
+});
+
+// Save entry
+$id("saveEntryBtn").addEventListener("click", ()=>{
+  const date = $id("entryDate").value;
+  const desc = $id("entryDescription").value.trim();
+  const accountId = Number($id("entryAccountSelect").value);
+  const debit = $id("entryDebit").value;
+  const credit = $id("entryCredit").value;
+  if(!accountId){ alert("Choose an account."); return; }
+  if(!date){ alert("Enter date."); return; }
+  if(!desc){ alert("Enter description."); return; }
+  if((!debit || Number(debit)===0) && (!credit || Number(credit)===0)){ alert("Enter an amount in Debit or Credit."); return; }
+  addEntry(accountId, date, desc, debit, credit);
+  // clear form
+  $id("entryDate").value = ""; $id("entryDescription").value = ""; $id("entryDebit").value = ""; $id("entryCredit").value = "";
+});
+
+// Clear entry form
+$id("clearEntryBtn").addEventListener("click", ()=>{
+  $id("entryDate").value = ""; $id("entryDescription").value = ""; $id("entryDebit").value = ""; $id("entryCredit").value = "";
+});
+
+// Filter select: change which account is shown
+$id("accountFilter").addEventListener("change", (e)=>{
+  const v = Number(e.target.value);
+  if(v) { selectedAccountId = v; renderAll(); }
+});
+
+// Export CSV for current account
+$id("exportAccountBtn").addEventListener("click", ()=>{
+  if(!selectedAccountId){ alert("Select an account to export."); return; }
+  const a = findAccount(Number(selectedAccountId));
+  downloadCSV(ledgerToCSV(a), `${a.name.replace(/\s+/g,'_')}_ledger.csv`);
+});
+$id("exportAllBtn").addEventListener("click", ()=>{
+  // join all account CSVs into one zip-like string separated by markers (simple approach)
+  if(accounts.length===0){ alert("No accounts to export."); return; }
+  let combined = "";
+  accounts.forEach(a=>{
+    combined += `-- ACCOUNT: ${a.name} --\n`;
+    combined += ledgerToCSV(a);
+    combined += "\n\n";
+  });
+  downloadCSV(combined, `all_accounts_ledger.txt`); // text file with multiple sections
+});
+
+// Utilities for CSV download
+function ledgerToCSV(account){
+  const rows = [["Date","Description","Debit","Credit","Running Balance"]];
+  let bal = Number(account.openingBalance || 0);
+  for(const e of account.entries){
+    bal += (Number(e.debit || 0) - Number(e.credit || 0));
+    rows.push([e.date || "", e.desc || "", e.debit ? Number(e.debit).toFixed(2) : "", e.credit ? Number(e.credit).toFixed(2) : "", bal.toFixed(2)]);
+  }
+  return rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
+}
+function downloadCSV(text, filename){
+  const blob = new Blob([text], {type: "text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.style.display = "none";
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// Save selected account when clicking list (delegated)
+document.getElementById("accountsList").addEventListener("click", (e)=>{
+  const el = e.target.closest(".account-item");
+  if(!el) return;
+  const id = Number(el.dataset.id);
+  if(id){ selectedAccountId = id; renderAll(); }
+});
+
+// start
+seed();
+</script>
+</body>
+</html>
