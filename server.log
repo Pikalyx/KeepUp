@@ -1,0 +1,22 @@
+>>> RUNNING APP FILE: /Users/ceciliaonce/PersonalFinanceGurus/PersonalFinanceGurus/app.js
+>>> STATIC FOLDER: /Users/ceciliaonce/PersonalFinanceGurus/PersonalFinanceGurus/HTML_Frontend
+AUTH CONTROLLER: { signup: [AsyncFunction: signup] }
+>>> /newLedger route registered
+Server running at http://localhost:3000
+✅ Connected to SQLite database.
+✅ Database initialized with schema.sql
+ Default accounts already exist, skipping seeding.
+>>> REQ POST /signup
+>>> /signup POST route WAS HIT
+>>> auth_controller.signup called
+>>> REQ GET /
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /signup.html
+>>> REQ GET /
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /signup.html
+>>> REQ POST /signup
+>>> /signup POST route WAS HIT
+>>> auth_controller.signup called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg

@@ -19,6 +19,12 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Log every incoming request for debugging (method + path) (Done by VS Co-pilot)
+app.use((req, res, next) => {
+  console.log(`>>> REQ ${req.method} ${req.path}`);
+  next();
+});
+
 // Serve static frontend folder (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, "HTML_Frontend")));
 console.log(">>> STATIC FOLDER:", path.join(__dirname, "HTML_Frontend"));
@@ -27,6 +33,8 @@ app.post("/signup", (req, res, next) => {
   console.log(">>> /signup POST route WAS HIT");
   next();
 }, authController.signup);
+
+console.log("AUTH CONTROLLER:", authController);
 
 
 //API Routes
@@ -38,7 +46,7 @@ app.delete("/accounts/:id", transactionController.deleteAccount);
 
 app.get("/entries/:accountId", transactionController.getEntries);
 app.post("/entries", transactionController.addEntry);
-app.post("/signup", authController.signup);
+
 
 
 // Frontend Route 

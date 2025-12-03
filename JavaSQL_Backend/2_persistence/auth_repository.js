@@ -3,11 +3,11 @@ const db = require("../3_config/db");
 function createUser(username, email, passwordHash) {
     return new Promise((resolve, reject) => {
         const sql = `
-            INSERT INTO users (email, password_hash)
-            VALUES (?, ?)
+            INSERT INTO users (username, email, password_hash)
+            VALUES (?, ?, ?)
         `;
 
-        db.run(sql, [email, passwordHash], function (err) {
+        db.run(sql, [username, email, passwordHash], function (err) {
             if (err) return reject(err);
             resolve(this.lastID);
         });

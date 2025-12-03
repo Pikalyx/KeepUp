@@ -6,10 +6,10 @@ async function signup(req, res) {
 
   try {
     await authService.signup(username, email, password);
-    res.send("Signup successful!");
+    res.json({ success: true, message: "Signup successful!" });
   } catch (err) {
     console.error("Signup error:", err);
-    res.status(400).send("Signup failed: " + err.message);
+    res.status(400).json({ success: false, message: "Signup failed: " + err.message });
   }
 }
 
