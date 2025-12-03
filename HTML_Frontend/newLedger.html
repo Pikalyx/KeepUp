@@ -313,9 +313,16 @@ $id("createAccountBtn").onclick = async () => {
   const name = prompt("Enter new account name:");
   if (!name || !name.trim()) return;
 
-  await createAccount(name.trim());
+  const newAcc = await createAccount(name.trim());
+
+  // Select the new account by default
+  if (newAcc && newAcc.id) {
+    selectedAccountId = newAcc.id;
+  }
+
   await loadAccounts();
 };
+
 
 // Rename account
 $id("renameAccountBtn").onclick = async () => {
