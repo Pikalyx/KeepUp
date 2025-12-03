@@ -7,24 +7,29 @@ const cors = require("cors");
 
 // Import Controller
 const transactionController = require("./JavaSQL_Backend/0_Presentation/transaction_controller");
+const authController = require("./JavaSQL_Backend/0_Presentation/auth_controller");
+
 
 const app = express();
 const PORT = 3000;
 
-// ------------------- Middleware -------------------
+//  Middleware 
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve static frontend folder (HTML, CSS, JS)
-// *** CORRECTED FOLDER NAME ***
 app.use(express.static(path.join(__dirname, "HTML_Frontend")));
 console.log(">>> STATIC FOLDER:", path.join(__dirname, "HTML_Frontend"));
 
+app.post("/signup", (req, res, next) => {
+  console.log(">>> /signup POST route WAS HIT");
+  next();
+}, authController.signup);
 
 
-// ------------------- API Routes -------------------
+//API Routes
 
 app.get("/accounts", transactionController.getAccounts);
 app.post("/accounts", transactionController.createAccount);
@@ -33,9 +38,10 @@ app.delete("/accounts/:id", transactionController.deleteAccount);
 
 app.get("/entries/:accountId", transactionController.getEntries);
 app.post("/entries", transactionController.addEntry);
+app.post("/signup", authController.signup);
 
 
-// ------------------- Frontend Route -------------------
+// Frontend Route 
 
 app.get("/newLedger", (req, res) => {
   console.log(">>> /newLedger route WAS HIT");
@@ -55,7 +61,7 @@ console.log(">>> /newLedger route registered");
 
 
 
-// ------------------- Start Server -------------------
+//Start Server
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

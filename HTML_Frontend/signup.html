@@ -165,7 +165,31 @@
                 confirmPasswordError.textContent = '';
             }
 
-            // Here you can add code to send the form data to the server
+            //send data to backend
+            fetch("/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username, email, password
+                })
+            })
+            .then(async (res)=>{
+                const text = await res.text();
+                if(!res.ok){
+                    message.style.color = 'red';
+                    message.textContent = text;
+                } else {
+                    message.style.color = 'green';
+                    message.textContent = text;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                message.style.color = 'red';
+                message.textContent = 'An error occurred during signup.';
+            });
 
             message.style.color = 'green';
             message.textContent = 'Signup successful!';

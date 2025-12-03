@@ -1,6 +1,6 @@
 const db = require("../3_config/db");
 
-// -------------------------- ACCOUNTS --------------------------
+//  ACCOUNTS 
 
 // Get all accounts
 exports.getAllAccounts = () => {
@@ -13,7 +13,7 @@ exports.getAllAccounts = () => {
   });
 };
 
-// Create a new account
+// 1.C=Creating a new account
 exports.createAccount = (name) => {
   return new Promise((resolve, reject) => {
     const sql = `INSERT INTO accounts (name) VALUES (?)`;
@@ -24,7 +24,7 @@ exports.createAccount = (name) => {
   });
 };
 
-// Rename an account
+// 2.U =Rename an account
 exports.renameAccount = (id, newName) => {
   return new Promise((resolve, reject) => {
     const sql = `UPDATE accounts SET name = ? WHERE id = ?`;
@@ -35,7 +35,7 @@ exports.renameAccount = (id, newName) => {
   });
 };
 
-// Delete an account
+// 3. D = Delete an account
 exports.deleteAccount = (id) => {
   return new Promise((resolve, reject) => {
     const sql = `DELETE FROM accounts WHERE id = ?`;
@@ -47,7 +47,7 @@ exports.deleteAccount = (id) => {
 };
 
 
-// -------------------------- ENTRIES --------------------------
+//  ENTRIES 
 
 // Get all ledger entries for an account
 exports.getEntries = (accountId) => {
