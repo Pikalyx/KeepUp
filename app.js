@@ -1,35 +1,62 @@
-// Entry Point - start server (turn on your server)
-const path = require("path");
-const express = require("express"); //imports the express web framework (tool) to create a server
-const transactionController = require("./JavaSQL_Backend/0_Presentation/transaction_controller");
- // imports the Presentation layer
-// const dbRoutes = require("./3_config/db");
+// Entry Point - starts server
+console.log(">>> RUNNING APP FILE:", __filename);
 
-const app = express(); // Created an express app instance (server)
+const path = require("path");
+const express = require("express");
+const cors = require("cors");
+
+// Import Controller
+const transactionController = require("./JavaSQL_Backend/0_Presentation/transaction_controller");
+
+const app = express();
 const PORT = 3000;
 
+// ------------------- Middleware -------------------
 
-// This part was recommended budring debugging phase by ChatGPT
-
-// Allows Express to parse form submissions (from HTML <form> POSTs)
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-
-// Allows Express to parse JSON payloads (for API use or AJAX)
 app.use(express.json());
 
-// app.use("/", dbRoutes);
-// app.use(express.static(path.join(__dirname, "frontend")));
-app.get("/journal", transactionController.showJournal);
-app.use(express.static("HTML_Frontend"));
+// Serve static frontend folder (HTML, CSS, JS)
+// *** CORRECTED FOLDER NAME ***
+app.use(express.static(path.join(__dirname, "HTML_Frontend")));
+console.log(">>> STATIC FOLDER:", path.join(__dirname, "HTML_Frontend"));
 
-// app.post("/add_transaction", transactionController.addTransaction);
 
-// General Journal Routing
-// Route prameters; any user request (e.g., /orders/1) is passed to orderController.getOrder
-// app.get("/journal", transactionController.showJournal); // node app.jsDefines a route for retrieving transactions
 
-// Starts the Server
-// Confirms that it's running at http://localhost:3000
+// ------------------- API Routes -------------------
+
+app.get("/accounts", transactionController.getAccounts);
+app.post("/accounts", transactionController.createAccount);
+app.put("/accounts/:id", transactionController.renameAccount);
+app.delete("/accounts/:id", transactionController.deleteAccount);
+
+app.get("/entries/:accountId", transactionController.getEntries);
+app.post("/entries", transactionController.addEntry);
+
+
+// ------------------- Frontend Route -------------------
+
+app.get("/newLedger", (req, res) => {
+  console.log(">>> /newLedger route WAS HIT");
+  
+  res.sendFile(
+    path.join(__dirname, "HTML_Frontend", "newLedger.html"),
+    (err) => {
+      if (err) {
+        console.log(">>> ERROR SENDING FILE:", err);
+        res.status(500).send("File error");
+      }
+    }
+  );
+});
+
+console.log(">>> /newLedger route registered");
+
+
+
+// ------------------- Start Server -------------------
+
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`)
-})
+  console.log(`Server running at http://localhost:${PORT}`);
+});
