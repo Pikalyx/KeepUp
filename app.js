@@ -26,8 +26,9 @@ app.use((req, res, next) => {
 });
 
 // Serve static frontend folder (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, "HTML_Frontend")));
-console.log(">>> STATIC FOLDER:", path.join(__dirname, "HTML_Frontend"));
+// Serve `signup.html` as the default index when requesting `/`.
+app.use(express.static(path.join(__dirname, "HTML_Frontend"), { index: "signup.html" }));
+console.log(">>> STATIC FOLDER:", path.join(__dirname, "HTML_Frontend"), "(default index: signup.html)");
 
 app.post("/signup", (req, res, next) => {
   console.log(">>> /signup POST route WAS HIT");

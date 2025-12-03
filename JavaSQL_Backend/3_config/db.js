@@ -8,9 +8,9 @@ const dbPath = path.join(__dirname, "../4_database/information.db");
 // Create / connect to DB
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error("❌ Error connecting to SQLite DB:", err.message);
+    console.error(" Error connecting to SQLite DB:", err.message);
   } else {
-    console.log("✅ Connected to SQLite database.");
+    console.log(" Connected to SQLite database.");
     initializeSchema();
   }
 });
@@ -20,7 +20,7 @@ function initializeSchema() {
   const schemaPath = path.join(__dirname, "../4_database/schema.sql");
 
   if (!fs.existsSync(schemaPath)) {
-    console.error("❌ schema.sql not found:", schemaPath);
+    console.error(" schema.sql not found:", schemaPath);
     return;
   }
 
@@ -28,13 +28,46 @@ function initializeSchema() {
 
   db.exec(schema, (err) => {
     if (err) {
-      console.error("❌ Error loading schema.sql:", err.message);
+      console.error(" Error loading schema.sql:", err.message);
     } else {
-      console.log("✅ Database initialized with schema.sql");
-      seedDefaultAccounts(); 
+      console.log(" Database initialized with schema.sql");
+      // Ensure any required migrations are applied for existing DBs
+      ensureUsernameColumn()
+        .then(() => seedDefaultAccounts())
+        .catch((e) => {
+          console.error(' Migration error:', e && e.message ? e.message : e);
+          // Still attempt to seed accounts even if migration fails (SUGGESTED BY Co-pilot)
+          seedDefaultAccounts();
+        });
     }
   });
 }
+
+// Ensure the `username` column exists in `users` table. If missing, add it. (Debgging here BY Co-pilot)
+function ensureUsernameColumn() {
+  return new Promise((resolve, reject) => {
+    db.all("PRAGMA table_info(users);", (err, rows) => {
+      if (err) return reject(err);
+
+      const hasUsername = rows && rows.some((r) => r.name === "username");
+      if (hasUsername) {
+        console.log(" users.username column exists");
+        return resolve();
+      }
+
+      console.log(" users.username column missing — adding column (nullable)...");
+      // Add column as nullable to avoid breaking existing rows
+      db.run("ALTER TABLE users ADD COLUMN username TEXT;", (alterErr) => {
+        if (alterErr) return reject(alterErr);
+        console.log(" Added users.username column");
+        resolve();
+      });
+    });
+  });
+}
+
+//(until here)
+
 // Create default accounts if table is empty
 function seedDefaultAccounts() {
   const defaultAccounts = [
@@ -54,7 +87,7 @@ function seedDefaultAccounts() {
 
   db.get("SELECT COUNT(*) AS count FROM accounts", (err, row) => {
     if (err) {
-      console.error("❌ Error checking accounts table:", err.message);
+      console.error(" Error checking accounts table:", err.message);
       return;
     }
 
