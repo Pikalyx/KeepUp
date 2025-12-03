@@ -35,6 +35,12 @@ app.post("/signup", (req, res, next) => {
   next();
 }, authController.signup);
 
+// Signin route
+app.post("/signin", (req, res, next) => {
+  console.log(">>> /signin POST route WAS HIT");
+  next();
+}, authController.signin);
+
 console.log("AUTH CONTROLLER:", authController);
 
 

@@ -29,3 +29,16 @@ function createDefaultAccount(userId) {
 }
 
 module.exports = { createUser, createDefaultAccount };
+
+function findUserByEmail(email) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT id, username, email, password_hash FROM users WHERE email = ?`;
+        db.get(sql, [email], (err, row) => {
+            if (err) return reject(err);
+            resolve(row);
+        });
+    });
+}
+
+// export additional function
+module.exports = { createUser, createDefaultAccount, findUserByEmail };

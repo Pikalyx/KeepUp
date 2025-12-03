@@ -13,4 +13,15 @@ async function signup(username, email, password) {
     return userId;
 }
 
-module.exports = {signup};
+async function signin(email, password) {
+    const user = await authRepo.findUserByEmail(email);
+    if (!user) throw new Error('Invalid email or password');
+
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) throw new Error('Invalid email or password');
+
+    // return safe user info
+    return { id: user.id, username: user.username, email: user.email };
+}
+
+module.exports = { signup, signin };
