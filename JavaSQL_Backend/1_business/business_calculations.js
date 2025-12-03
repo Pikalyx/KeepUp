@@ -1,5 +1,6 @@
 const transactionRepo = require("../2_persistence/transactionhandler");
 
+
 async function createTransaction(data) {
   // Basic Error Handling
   if (data.amount <= 0) {
@@ -14,8 +15,6 @@ async function createTransaction(data) {
 
 async function listTransactions() {
   const transactions = await transactionRepo.getAllTransactions();
-
-  // Could add business logic here (totals, formatting, etc.)
   return transactions;
 }
 

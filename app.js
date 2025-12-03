@@ -1,6 +1,9 @@
 // Entry Point - start server (turn on your server)
+const path = require("path");
 const express = require("express"); //imports the express web framework (tool) to create a server
-const transactionController = require("./0_Presentation/transaction_controller"); // imports the Presentation layer
+const transactionController = require("./JavaSQL_Backend/0_Presentation/transaction_controller");
+ // imports the Presentation layer
+// const dbRoutes = require("./3_config/db");
 
 const app = express(); // Created an express app instance (server)
 const PORT = 3000;
@@ -14,9 +17,16 @@ app.use(express.urlencoded({ extended: true }));
 // Allows Express to parse JSON payloads (for API use or AJAX)
 app.use(express.json());
 
+// app.use("/", dbRoutes);
+// app.use(express.static(path.join(__dirname, "frontend")));
+app.get("/journal", transactionController.showJournal);
+app.use(express.static("HTML_Frontend"));
+
+// app.post("/add_transaction", transactionController.addTransaction);
+
 // General Journal Routing
 // Route prameters; any user request (e.g., /orders/1) is passed to orderController.getOrder
-app.get("/journal", transactionController.showJournal); // node app.jsDefines a route for retrieving transactions
+// app.get("/journal", transactionController.showJournal); // node app.jsDefines a route for retrieving transactions
 
 // Starts the Server
 // Confirms that it's running at http://localhost:3000
