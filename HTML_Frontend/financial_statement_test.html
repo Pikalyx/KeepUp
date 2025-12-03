@@ -63,16 +63,16 @@
       </tr>
       <tr>
         <td class="left">Cash</td>
-        <td id="Cash"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Accounts receivable</td>
-        <td id="Accounts Receivable"></td>
+        <td></td>
       </tr>
       <!-- more rows -->
       <tr>
         <td class="left">Inventory</td>
-        <td id="Inventory"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left"><strong>Total assets</strong></td>
@@ -88,15 +88,15 @@
     <tbody>
       <tr>
         <td class="left">Accounts payable</td>
-        <td id="Accounts Payable"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Common stock</td>
-        <td id="Common Stock"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Retained earnings</td>
-        <td id="Retained Earnings"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left"><strong>Total iabilities and owners' equity</strong></td>
@@ -118,15 +118,15 @@
     <tbody>
       <tr>
         <td class="left">Sales revenue</td>
-        <td id="Sales Revenue"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Service revenue</td>
-        <td id="Service Revenue"></td>
+        <td></td>
       </tr>
       <tr>
         <td class ="left">Total revenues</td>
-        <td id="Total Revenues"></td>
+        <td></td>
       </tr>
     <thead>
       <tr>
@@ -136,23 +136,23 @@
     </thead>
       <tr>
         <td class="left">Cost of goods sold</td>
-        <td id="Cost of Goods Sold"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Rent expense</td>
-        <td id="Rent Expense"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Payroll expense</td>
-        <td id="Payroll Expense"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left">Supplies expense</td>
-        <td id="Supplies Expense"></td>
+        <td></td>
       </tr>
       <tr>
         <td class="left"><strong>Gross profit</strong></td>
-        <td><strong id="Gross Profit"></strong></td>
+        <td><strong></strong></td>
       </tr>
       <!-- more rows -->
     </tbody>
@@ -188,82 +188,6 @@
       <td></td>
     </tr>
   </table>
-
-  <script>
-  // Map account names to their IDs (will be populated dynamically)
-  const accountMap = {};
-
-  // Fetch all accounts and build a map
-  async function loadAllAccounts() {
-    try {
-      const res = await fetch("/accounts");
-      const accounts = await res.json();
-      accounts.forEach(acc => {
-        accountMap[acc.name] = acc.id;
-      });
-      console.log("Loaded accounts:", accountMap);
-    } catch (err) {
-      console.error("Error loading accounts:", err);
-    }
-  }
-
-  // Fetch entries for an account and calculate balance (debits - credits)
-  async function loadBalance(accountName) {
-    try {
-      const accountId = accountMap[accountName];
-      if (!accountId) {
-        console.warn("Account not found:", accountName);
-        return;
-      }
-
-      const res = await fetch(`/entries/${accountId}`);
-      const entries = await res.json();
-
-      // Sum debits and credits
-      const totalDebit = entries.reduce((sum, e) => sum + (e.debit || 0), 0);
-      const totalCredit = entries.reduce((sum, e) => sum + (e.credit || 0), 0);
-      const balance = totalDebit - totalCredit;
-
-      // Display in the corresponding cell
-      const cell = document.getElementById(accountName);
-      if (cell) {
-        cell.textContent = Number(balance).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-      }
-    } catch (err) {
-      console.error("Error loading balance for", accountName, err);
-    }
-  }
-
-  // Initialize on page load
-  async function init() {
-    await loadAllAccounts();
-
-    // These are the account names in your financial statement
-    const displayAccounts = [
-      "Cash",
-      "Accounts Receivable",
-      "Inventory",
-      "Accounts Payable",
-      "Common Stock",
-      "Retained Earnings",
-      "Rent Expense",
-      "Payroll Expense",
-      "Supplies Expense",
-      "Cost of Goods Sold",
-      "Sales Revenue",
-      "Service Revenue"
-    ];
-
-    // Load balance for each account
-    displayAccounts.forEach(name => loadBalance(name));
-  }
-
-  // Run on page load
-  document.addEventListener("DOMContentLoaded", init);
-  </script>
 
 </body>
 </html>
