@@ -19,12 +19,11 @@ async function signin(req, res) {
     
     try {
         const user = await authService.signin(email, password);
-        // On success, return minimal user info (no password hash)
-        // res.json({ success: true, message: 'Signin successful', user });
-        } catch (err) {
-            console.error('Signin error:', err);
-            res.status(401).json({ success: false, message: err.message || 'Signin failed' });
-        }    
+        res.json({ success: true, message: 'Signin successful', user });
+    } catch (err) {
+        console.error('Signin error:', err);
+        res.status(401).json({ success: false, message: err.message || 'Signin failed' });
+    }    
 }
 
 module.exports = { signup, signin };

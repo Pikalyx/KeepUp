@@ -113,9 +113,7 @@
 </div>
 
 <script>
-/* ==========================================================
-   REAL DATABASE-POWERED LEDGER (connected to Node backend)
-   ========================================================== */
+/* Database ledger (connected to Node backend) */
 
 // Helper shortcuts
 function $id(id){ return document.getElementById(id); }
@@ -125,9 +123,7 @@ function money(v){ return Number(v).toLocaleString(undefined, {minimumFractionDi
 let accounts = [];
 let selectedAccountId = null;
 
-/* ----------------------------------------------------------
-   API CALLS
-   ---------------------------------------------------------- */
+/* API CALLS*/
 
 // Load all accounts from DB
 async function loadAccounts() {
@@ -177,9 +173,7 @@ async function addEntryRequest(entry) {
   return res.json();
 }
 
-/* ----------------------------------------------------------
-   FRONTEND RENDERING
-   ---------------------------------------------------------- */
+/* FRONTEND RENDERING*/
 
 async function renderAll() {
   renderAccountsList();
@@ -304,9 +298,8 @@ async function renderLedger() {
   });
 }
 
-/* ----------------------------------------------------------
-   UI HANDLERS
-   ---------------------------------------------------------- */
+/* UI HANDLERS*/
+
 
 // Create new account
 $id("createAccountBtn").onclick = async () => {
@@ -380,9 +373,7 @@ $id("addEntryToggle").onclick = () => {
 };
 
 
-/* ----------------------------------------------------------
-   INITIAL LOAD
-   ---------------------------------------------------------- */
+/* INITIAL LOAD*/
 loadAccounts();
 </script>
 

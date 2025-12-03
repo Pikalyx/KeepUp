@@ -74,7 +74,22 @@ app.get("/newLedger", (req, res) => {
 
 console.log(">>> /newLedger route registered");
 
+// Serve financial statements at /statements.html
+app.get("/statements.html", (req, res) => {
+  console.log(">>> /statements.html route WAS HIT");
+  
+  res.sendFile(
+    path.join(__dirname, "HTML_Frontend", "financial_statement_test.html"),
+    (err) => {
+      if (err) {
+        console.log(">>> ERROR SENDING FILE:", err);
+        res.status(500).send("File error");
+      }
+    }
+  );
+});
 
+console.log(">>> /statements.html route registered");
 
 //Start Server
 
