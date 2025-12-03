@@ -47,7 +47,6 @@
 </head>
 <body>
   <h2>CONSOLIDATED BALANCE SHEETS</h2>
-  <div class="caption">(In thousands of U.S. dollars)</div>
 
   <table>
     <thead>
@@ -173,19 +172,19 @@
   </thead>
     <tr>
       <td class = "left">Current Ratio</td>
-      <td></td>
+      <td id="Current Ratio"></td>
     </tr>
     <tr>
       <td class = "left">Quick Ratio</td>
-      <td></td>
+      <td id="Quick Ratio"></td>
     </tr>
     <tr>
       <td class = "left">Profit Margin</td>
-      <td></td>
+      <td id="Profit Margin"></td>
     </tr>
     <tr>
       <td class = "left">Debt Ratio</td>
-      <td></td>
+      <td id="Debt Ratio"></td>
     </tr>
   </table>
 
@@ -286,6 +285,28 @@
     const totalExpenses = (balances["Cost of Goods Sold"] || 0) + (balances["Rent Expense"] || 0) + (balances["Payroll Expense"] || 0) + (balances["Supplies Expense"] || 0);
     const grossProfit = totalRevenues - totalExpenses;
     document.getElementById("Gross Profit").textContent = formatNumber(grossProfit);
+
+    // Calculate and display financial ratios
+    // Current Ratio = (Cash + AR + Inventory) / Accounts Payable
+    const currentAssets = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0) + (balances["Inventory"] || 0);
+    const currentLiabilities = (balances["Accounts Payable"] || 0);
+    const currentRatio = currentLiabilities !== 0 ? currentAssets / currentLiabilities : 0;
+    document.getElementById("Current Ratio").textContent = formatNumber(currentRatio);
+
+    // Quick Ratio = (Cash + AR) / Accounts Payable
+    const quickAssets = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0);
+    const quickRatio = currentLiabilities !== 0 ? quickAssets / currentLiabilities : 0;
+    document.getElementById("Quick Ratio").textContent = formatNumber(quickRatio);
+
+    // Profit Margin = Gross Profit / Total Revenues
+    const profitMargin = totalRevenues !== 0 ? grossProfit / totalRevenues : 0;
+    document.getElementById("Profit Margin").textContent = formatNumber(profitMargin);
+
+    // Debt Ratio = Total Liabilities / Total Assets
+    const totalLiab = (balances["Accounts Payable"] || 0) + (balances["Common Stock"] || 0) + (balances["Retained Earnings"] || 0);
+    const totalAssetsFull = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0) + (balances["Inventory"] || 0) + (balances["Accounts Payable"] || 0) + (balances["Common Stock"] || 0) + (balances["Retained Earnings"] || 0);
+    const debtRatio = totalAssetsFull !== 0 ? totalLiab / totalAssetsFull : 0;
+    document.getElementById("Debt Ratio").textContent = formatNumber(debtRatio);
   }
 
   // Run on page load
