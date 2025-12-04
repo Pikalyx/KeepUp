@@ -60,11 +60,11 @@ Team Members: Julie Amon, Noah Gillespie, Joe Morton, and Bryson Perryman
    This page displays a summary of their accounts in a more formal manner. It is modelled after the graphs commonly found within SEC Annual Filings. This page also will help users determine whether their business gaining or losing money by calculating the total assets, total liabilities, and total equity.
 
    4. Info- The Info Page
-
-## Access the CI/CD web-page here!
-https://personalfinancegurus-1.onrender.com/
    This pages displays a plethora of business ratios which will help determine the degree of success the business is having. This data is taken from the sql backend and then run through a business formula. The output is displayed to the user upon clicking into the page
 
    6. Help/Database- The Knowledge Base
    This place serves to educate user on bassic account terms, tips, and strategies. This webpage also hosts a popular Q&A where the devlopers answer the most sought out questions about the software.
+
+## Access the CI/CD web-page here!
+https://personalfinancegurus-1.onrender.com/
 
