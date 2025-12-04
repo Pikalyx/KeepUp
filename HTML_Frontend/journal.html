@@ -1,0 +1,145 @@
+<!--ChatGPT helped with some minor de-bugging-->
+<!-- This is the New General Journal -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>General Journal</title>
+    
+        <style>
+            table, th, td{
+                border: 1px solid black
+            }
+            body{
+                background-color: rgba(15, 212, 108);
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
+            table{
+                background-color: whitesmoke;
+                table-layout: fixed;
+                opacity: .85;
+            }
+            th{
+                text-align: center;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: medium;
+                font-weight: bold;
+            }
+            tr{
+                text-align: left;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: small;
+            }
+            input{
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: small;
+            }
+        </style>
+    </head>
+        <!--What do we think of the colors? Change or keep?-->
+    <body>
+        <!--As of now, only works with GENERAL JOURNALS!-->
+        <button type = "button", onclick="importCSV()">Import Transaction</button>
+        <table style = "width:100%", id = "Journal">
+            <tr>
+                <th style="width: 7%;">Date</th>
+                <th style="width: 25%;">Account</th>
+                <th style="width: 30%;">Memo</th>
+                <th style="width: 19%;">Debit</th>
+                <th style="width: 19%;">Credit</th>
+            </tr>
+            <tr>
+                <td contenteditable="true">
+                    <input type="date" 
+                    id="Date" 
+                    min="2025-01-01" 
+                    max="2025-12-31" 
+                    step="1"> </td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+                <td contenteditable="true"> </td>
+            </tr>
+        </table>
+        <button type="button", onclick="addRow()">Add Row</button>
+        <button type = "submit", onclick="save()">Save Transaction</button>
+
+        <script>
+            function addRow(){
+                let table = document.getElementById("Journal");
+                let newRow = table.insertRow();
+
+                const cell1 = newRow.insertCell();
+                const cell2 = newRow.insertCell();
+                const cell3 = newRow.insertCell();
+                const cell4 = newRow.insertCell();
+                const cell5 = newRow.insertCell();
+
+                cell2.contentEditable = "true";
+                cell3.contentEditable = "true";
+                cell4.contentEditable = "true";
+                cell5.contentEditable = "true";
+            }
+
+            function save() {
+                    let table = document.getElementById("Journal");
+                    let rows = table.rows;
+
+                    for (let i = 1; i < rows.length; i++) {
+                        let cells = rows[i].cells;
+                        //Extract values
+                        let dateInput = cells[0].querySelector("input");
+                        let date = dateInput ? dateInput.value : "";
+
+                        let account = cells[1].innerText.trim();
+                        let memo = cells[2].innerText.trim();
+                        let debit = cells[3].innerText.trim();
+                        let credit = cells[4].innerText.trim();
+
+                        //Skipping empty rows
+                        if(!date && !account && !memo && !debit &&!credit) continue;
+
+                        //Debit or Credit
+                        let is_credit = credit !== "" ? 1 : 0;
+                        let amount = is_credit ? parseFloat(credit) : parseFloat(debit);
+
+                        if (isNaN(amount)) continue;
+
+                        //Send to backend
+                        fetch("/add_transaction", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json"},
+                            body: JSON.stringify({
+                                transaction_date: date,
+                                transaction_type: account,
+                                description: memo,
+                                is_credit: is_credit,
+                                amount: amount
+                            }),
+                        })
+                        .then(res => {
+                            if (res.ok) {
+                                console.log("Saved: ", account, amount);
+                            }else{
+                                console.log("Error saving");
+                            }
+                        })
+                        .catch(err => console.error("Fetch error: ", err));
+                    }
+                    alert("Transactions saved!");
+                }
+
+            function importCSV(){
+                    console.log("Import CSV button clicked — can add later.");
+                }
+            
+        </script>
+    </body>
+</html>

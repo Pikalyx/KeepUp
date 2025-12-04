@@ -1,0 +1,94 @@
+>>> RUNNING APP FILE: /Users/ceciliaonce/PersonalFinanceGurus/PersonalFinanceGurus/app.js
+>>> STATIC FOLDER: /Users/ceciliaonce/PersonalFinanceGurus/PersonalFinanceGurus/HTML_Frontend (default index: signup.html)
+AUTH CONTROLLER: { signup: [AsyncFunction: signup], signin: [AsyncFunction: signin] }
+>>> /newLedger route registered
+Server running at http://localhost:3000
+ Connected to SQLite database.
+ Database initialized with schema.sql
+ users.username column exists
+ Default accounts already exist, skipping seeding.
+>>> REQ GET /financial_statement_test.html
+>>> REQ GET /financials
+>>> REQ GET /financials
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /newLedger
+>>> /newLedger route WAS HIT
+>>> REQ GET /accounts
+>>> REQ GET /entries/36
+>>> REQ GET /entries/37
+>>> REQ GET /entries/38
+>>> REQ GET /entries/39
+>>> REQ GET /entries/40
+>>> REQ GET /entries/42
+>>> REQ GET /entries/43
+>>> REQ GET /entries/41
+>>> REQ GET /entries/44
+>>> REQ GET /entries/45
+>>> REQ GET /entries/47
+>>> REQ GET /entries/48
+>>> REQ GET /entries/46
+>>> REQ GET /entries/36
+>>> REQ GET /statements.html
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /financial_statement_test
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /financial_statement_test
+>>> REQ GET /financial_statement_test
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html
+>>> REQ GET /
+>>> REQ GET /signin.html
+>>> REQ POST /signin
+>>> /signin POST route WAS HIT
+>>> auth_controller.signin called
+>>> REQ GET /index.html
+>>> REQ GET /SWElogo.jpeg
+>>> REQ GET /statements.html

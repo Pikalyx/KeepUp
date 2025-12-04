@@ -1,22 +1,27 @@
-drop table if exists user_login_data; -- if there's existing table (data), then remove it
-
-create table user_login_data (
-    id integer AUTO_INCREMENT primary key,
-    username varchar(50) not null, -- attribute name || attribute datatype
-    pass_hash varchar(50) not null
+-- Account  (MULTI-ACCOUNT LEDGER)
+CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL
 );
 
-/*Master Doc Schema, must be sorted into different financial statements (IS, BS, RE, and Cash FLows)*/
-create table User_transactions(
-    id integer AUTO_INCREMENT primary key ,
-    user_id integer not null,
-    transaction_date date default current_timestamp,
-    Transaction_desc text,
-    transaction_type varchar(50),
-    is_credit boolean,
-    amount decimal(10,2) not null,
-    foreign key (user_id) references user_login_data(id)
+-- Users 
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 
-INSERT INTO user_login_data(id, username, pass_hash) VALUES(1, 'amononce', '123internetstreet');
+-- Ledger entries 
+CREATE TABLE IF NOT EXISTS ledger_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    description TEXT,
+    debit REAL DEFAULT 0,
+    credit REAL DEFAULT 0,
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
+);

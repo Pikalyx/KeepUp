@@ -1,66 +1,115 @@
-const express = require("express");
-const router = express.Router();
 const sqlite3 = require("sqlite3").verbose();
+const fs = require("fs");
+const path = require("path");
 
-// IMPORTANT: use a .db file instead of .sql
-const db = new sqlite3.Database("../4_database/information.db");
+// Path to your SQLite database
+const dbPath = path.join(__dirname, "../4_database/information.db");
 
-// 1. Handle POST from the General Journal form
-router.post("/add_transaction", (req, res) => {
-  const { transaction_date, transaction_type, description, is_credit, amount } = req.body;
-  const user_id = 1;
-
-  const sql = `
-    INSERT INTO user_transactions 
-    (user_id, transaction_date, transaction_type, description, is_credit, amount)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-
-  db.run(sql, [user_id, transaction_date, transaction_type, description, is_credit, amount], (err) => {
-    if (err) {
-      console.error("Error inserting transaction:", err.message);
-      res.status(500).send("Database insert failed.");
-    } else {
-      console.log("✅ Transaction added successfully!");
-      res.redirect("/journal");
-    }
-  });
+// Create / connect to DB
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error(" Error connecting to SQLite DB:", err.message);
+  } else {
+    console.log(" Connected to SQLite database.");
+    initializeSchema();
+  }
 });
 
-// 2. Fetch all transactions
-router.get("/journal", (req, res) => {
-  const sql = `SELECT * FROM user_transactions ORDER BY transaction_date DESC`;
+// Load and execute schema.sql
+function initializeSchema() {
+  const schemaPath = path.join(__dirname, "../4_database/schema.sql");
 
-  db.all(sql, [], (err, rows) => {
+  if (!fs.existsSync(schemaPath)) {
+    console.error(" schema.sql not found:", schemaPath);
+    return;
+  }
+
+  const schema = fs.readFileSync(schemaPath, "utf8");
+
+  db.exec(schema, (err) => {
     if (err) {
-      console.error("Error fetching transactions:", err.message);
-      res.status(500).send("Error retrieving transactions.");
+      console.error(" Error loading schema.sql:", err.message);
     } else {
-      let tableRows = rows
-        .map(tx => `
-          <tr>
-            <td>${tx.transaction_date}</td>
-            <td>${tx.transaction_type}</td>
-            <td>${tx.description}</td>
-            <td>${tx.is_credit == 0 ? "✔" : ""}</td>
-            <td>${tx.is_credit == 1 ? "✔" : ""}</td>
-            <td>${tx.amount.toFixed(2)}</td>
-          </tr>
-        `)
-        .join("");
-
-      const html = `
-        <html>
-          <body>
-            <h1>General Journal</h1>
-            <table>${tableRows}</table>
-          </body>
-        </html>
-      `;
-
-      res.send(html);
+      console.log(" Database initialized with schema.sql");
+      // Ensure any required migrations are applied for existing DBs
+      ensureUsernameColumn()
+        .then(() => seedDefaultAccounts())
+        .catch((e) => {
+          console.error(' Migration error:', e && e.message ? e.message : e);
+          // Still attempt to seed accounts even if migration fails (SUGGESTED BY Co-pilot)
+          seedDefaultAccounts();
+        });
     }
   });
-});
+}
 
-module.exports = router;
+// Ensure the `username` column exists in `users` table. If missing, add it. (Debgging here BY Co-pilot)
+function ensureUsernameColumn() {
+  return new Promise((resolve, reject) => {
+    db.all("PRAGMA table_info(users);", (err, rows) => {
+      if (err) return reject(err);
+
+      const hasUsername = rows && rows.some((r) => r.name === "username");
+      if (hasUsername) {
+        console.log(" users.username column exists");
+        return resolve();
+      }
+
+      console.log(" users.username column missing — adding column (nullable)...");
+      // Add column as nullable to avoid breaking existing rows
+      db.run("ALTER TABLE users ADD COLUMN username TEXT;", (alterErr) => {
+        if (alterErr) return reject(alterErr);
+        console.log(" Added users.username column");
+        resolve();
+      });
+    });
+  });
+}
+
+//(until here)
+
+// Create default accounts if table is empty
+function seedDefaultAccounts() {
+  const defaultAccounts = [
+    "Cash",
+    "Accounts Receivable",
+    "Inventory",
+    "Accounts Payable",
+    "Common Stock",
+    "Retained Earnings",
+    "Rent Expense",
+    "Payroll Expense",
+    "Supplies Expense",
+    "Cost of Goods Sold",
+    "Sales Revenue",
+    "Service Revenue"
+  ];
+
+  db.get("SELECT COUNT(*) AS count FROM accounts", (err, row) => {
+    if (err) {
+      console.error(" Error checking accounts table:", err.message);
+      return;
+    }
+
+    if (row.count > 0) {
+      console.log(" Default accounts already exist, skipping seeding.");
+      return;
+    }
+
+    console.log(" Seeding default chart of accounts...");
+
+    const insertSQL = `INSERT INTO accounts (name) VALUES (?)`;
+
+    defaultAccounts.forEach((name) => {
+      db.run(insertSQL, [name], (err) => {
+        if (err) console.error("Error inserting account:", name, err.message);
+      });
+    });
+
+    console.log(" Default accounts created.");
+  });
+}
+
+
+
+module.exports = db;

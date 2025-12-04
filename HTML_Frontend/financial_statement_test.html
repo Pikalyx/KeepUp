@@ -1,3 +1,4 @@
+<!-- ChatGPT Generated Template -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
   <title>Consolidated Financial Statements</title>
   <style>
     body {
-      font-family: “Times New Roman”, serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 12pt;
       margin: 1in;
       color: #000;
@@ -46,78 +47,271 @@
 </head>
 <body>
   <h2>CONSOLIDATED BALANCE SHEETS</h2>
-  <div class="caption">(In thousands of U.S. dollars)</div>
 
   <table>
     <thead>
       <tr>
         <th class="left">Assets</th>
-        <th>Dec 31, 2024</th>
-        <th>Dec 31, 2023</th>
+        <th>Dec 31, 2025</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="left">Current assets:</td>
-        <td>12,345</td>
-        <td>10,987</td>
+        <td></td>
       </tr>
       <tr>
-        <td class="left">Cash and cash equivalents</td>
-        <td>5,678</td>
-        <td>4,321</td>
+        <td class="left">Cash</td>
+        <td id="Cash"></td>
       </tr>
       <tr>
-        <td class="left">Accounts receivable, net</td>
-        <td>3,210</td>
-        <td>2,987</td>
+        <td class="left">Accounts receivable</td>
+        <td id="Accounts Receivable"></td>
       </tr>
       <!-- more rows -->
       <tr>
+        <td class="left">Inventory</td>
+        <td id="Inventory"></td>
+      </tr>
+      <tr>
         <td class="left"><strong>Total assets</strong></td>
-        <td><strong>XX,XXX</strong></td>
-        <td><strong>YY,YYY</strong></td>
+        <td><strong id="Total Assets"></strong></td>
+      </tr>
+    </tbody>
+    <thead>
+      <tr>
+        <th class="left">Liabilities and Owners' Equity</th>
+        <th>Dec 31, 2025</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="left">Accounts payable</td>
+        <td id="Accounts Payable"></td>
+      </tr>
+      <tr>
+        <td class="left">Common stock</td>
+        <td id="Common Stock"></td>
+      </tr>
+      <tr>
+        <td class="left">Retained earnings</td>
+        <td id="Retained Earnings"></td>
+      </tr>
+      <tr>
+        <td class="left"><strong>Total liabilities and owners' equity</strong></td>
+        <td><strong id="Total Liabilities Equity"></strong></td>
       </tr>
     </tbody>
   </table>
 
-  <h2>CONSOLIDATED STATEMENTS OF OPERATIONS</h2>
+  <h2>CONSOLIDATED INCOME STATEMENTS</h2>
   <div class="caption">(For the years ended December 31)</div>
 
   <table>
     <thead>
       <tr>
         <th class="left">Revenue</th>
-        <th>2024</th>
-        <th>2023</th>
+        <th>2025</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="left">Net sales</td>
-        <td>20,000</td>
-        <td>18,000</td>
+        <td class="left">Sales revenue</td>
+        <td id="Sales Revenue"></td>
       </tr>
       <tr>
+        <td class="left">Service revenue</td>
+        <td id="Service Revenue"></td>
+      </tr>
+      <tr>
+        <td class ="left">Total revenues</td>
+        <td id="Total Revenues"></td>
+      </tr>
+    <thead>
+      <tr>
+        <th class="left">Expenses</th>
+        <th>2025</th>
+      </tr>
+    </thead>
+      <tr>
         <td class="left">Cost of goods sold</td>
-        <td>12,000</td>
-        <td>11,000</td>
+        <td id="Cost of Goods Sold"></td>
+      </tr>
+      <tr>
+        <td class="left">Rent expense</td>
+        <td id="Rent Expense"></td>
+      </tr>
+      <tr>
+        <td class="left">Payroll expense</td>
+        <td id="Payroll Expense"></td>
+      </tr>
+      <tr>
+        <td class="left">Supplies expense</td>
+        <td id="Supplies Expense"></td>
       </tr>
       <tr>
         <td class="left"><strong>Gross profit</strong></td>
-        <td><strong>8,000</strong></td>
-        <td><strong>7,000</strong></td>
+        <td><strong id="Gross Profit"></strong></td>
       </tr>
       <!-- more rows -->
     </tbody>
   </table>
 
-  <div class="notes">
-    <strong>Notes to Consolidated Financial Statements</strong><br>
-    1. Description of business and summary of significant accounting policies … <br>
-    2. Inventories … <br>
-    3. Property, plant and equipment … <br>
-    <!-- etc. -->
-  </div>
+  <h2>SUPPLIMENTARY FINANCIAL RATIOS</h2>
+  <div class="caption">(For the years ended December 31)</div>
+  <table>
+    <thead>
+    <tr>
+      <th class = "left">
+        Financial Ratios
+      </th>
+      <th>
+        2025
+      </th>
+    </tr>
+  </thead>
+    <tr>
+      <td class = "left">Current Ratio</td>
+      <td id="Current Ratio"></td>
+    </tr>
+    <tr>
+      <td class = "left">Quick Ratio</td>
+      <td id="Quick Ratio"></td>
+    </tr>
+    <tr>
+      <td class = "left">Profit Margin</td>
+      <td id="Profit Margin"></td>
+    </tr>
+    <tr>
+      <td class = "left">Debt Ratio</td>
+      <td id="Debt Ratio"></td>
+    </tr>
+  </table>
+
+  <script>
+  // Map account names to their IDs
+  const accountMap = {};
+
+  // Fetch all accounts and build a map
+  async function loadAllAccounts() {
+    try {
+      const res = await fetch("/accounts");
+      const accounts = await res.json();
+      accounts.forEach(acc => {
+        accountMap[acc.name] = acc.id;
+      });
+      console.log("Loaded accounts:", accountMap);
+    } catch (err) {
+      console.error("Error loading accounts:", err);
+    }
+  }
+
+  // Fetch entries for an account and calculate balance
+  async function loadBalance(accountName) {
+    try {
+      const accountId = accountMap[accountName];
+      if (!accountId) {
+        console.warn("Account not found:", accountName);
+        return 0;
+      }
+
+      const res = await fetch(`/entries/${accountId}`);
+      const entries = await res.json();
+
+      // Sum debits and credits
+      const totalDebit = entries.reduce((sum, e) => sum + (e.debit || 0), 0);
+      const totalCredit = entries.reduce((sum, e) => sum + (e.credit || 0), 0);
+      const balance = totalDebit - totalCredit;
+
+      // Display in the corresponding cell
+      const cell = document.getElementById(accountName);
+      if (cell) {
+        cell.textContent = Number(balance).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      return balance;
+    } catch (err) {
+      console.error("Error loading balance for", accountName, err);
+      return 0;
+    }
+  }
+
+  // Format a number for display
+  function formatNumber(num) {
+    return Number(num).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // Initialize on page load
+  async function init() {
+    await loadAllAccounts();
+
+    // Load individual account balances
+    const displayAccounts = [
+      "Cash",
+      "Accounts Receivable",
+      "Inventory",
+      "Accounts Payable",
+      "Common Stock",
+      "Retained Earnings",
+      "Rent Expense",
+      "Payroll Expense",
+      "Supplies Expense",
+      "Cost of Goods Sold",
+      "Sales Revenue",
+      "Service Revenue"
+    ];
+
+    const balances = {};
+    for (const name of displayAccounts) {
+      balances[name] = await loadBalance(name);
+    }
+
+    // Calculate and display totals
+    const totalAssets = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0) + (balances["Inventory"] || 0);
+    document.getElementById("Total Assets").textContent = formatNumber(totalAssets);
+
+    const totalLiabilities = (balances["Accounts Payable"] || 0) + (balances["Common Stock"] || 0) + (balances["Retained Earnings"] || 0);
+    document.getElementById("Total Liabilities Equity").textContent = formatNumber(totalLiabilities);
+
+    const totalRevenues = (balances["Sales Revenue"] || 0) + (balances["Service Revenue"] || 0);
+    document.getElementById("Total Revenues").textContent = formatNumber(totalRevenues);
+
+    const totalExpenses = (balances["Cost of Goods Sold"] || 0) + (balances["Rent Expense"] || 0) + (balances["Payroll Expense"] || 0) + (balances["Supplies Expense"] || 0);
+    const grossProfit = totalRevenues - totalExpenses;
+    document.getElementById("Gross Profit").textContent = formatNumber(grossProfit);
+
+    // Calculate and display financial ratios
+    // Current Ratio = (Cash + AR + Inventory) / Accounts Payable
+    const currentAssets = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0) + (balances["Inventory"] || 0);
+    const currentLiabilities = (balances["Accounts Payable"] || 0);
+    const currentRatio = currentLiabilities !== 0 ? currentAssets / currentLiabilities : 0;
+    document.getElementById("Current Ratio").textContent = formatNumber(currentRatio);
+
+    // Quick Ratio = (Cash + AR) / Accounts Payable
+    const quickAssets = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0);
+    const quickRatio = currentLiabilities !== 0 ? quickAssets / currentLiabilities : 0;
+    document.getElementById("Quick Ratio").textContent = formatNumber(quickRatio);
+
+    // Profit Margin = Gross Profit / Total Revenues
+    const profitMargin = totalRevenues !== 0 ? grossProfit / totalRevenues : 0;
+    document.getElementById("Profit Margin").textContent = formatNumber(profitMargin);
+
+    // Debt Ratio = Total Liabilities / Total Assets
+    const totalLiab = (balances["Accounts Payable"] || 0) + (balances["Common Stock"] || 0) + (balances["Retained Earnings"] || 0);
+    const totalAssetsFull = (balances["Cash"] || 0) + (balances["Accounts Receivable"] || 0) + (balances["Inventory"] || 0) + (balances["Accounts Payable"] || 0) + (balances["Common Stock"] || 0) + (balances["Retained Earnings"] || 0);
+    const debtRatio = totalAssetsFull !== 0 ? totalLiab / totalAssetsFull : 0;
+    document.getElementById("Debt Ratio").textContent = formatNumber(debtRatio);
+  }
+
+  // Run on page load
+  document.addEventListener("DOMContentLoaded", init);
+  </script>
+
 </body>
 </html>

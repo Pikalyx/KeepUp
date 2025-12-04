@@ -2,7 +2,6 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,6 +135,12 @@
             </div>
             <button type="submit">Signup</button>
         </form>
+
+        <p style="text-align:center; margin-top:10px; font-size:0.9em;">
+            Already have an account with us? <a href="signin.html">Click here</a>
+        </p>
+
+
         <p id="message"></p>
     </div>
     <script>
@@ -165,10 +170,33 @@
                 confirmPasswordError.textContent = '';
             }
 
-            // Here you can add code to send the form data to the server
-
-            message.style.color = 'green';
-            message.textContent = 'Signup successful!';
+            //send data to backend
+            fetch("/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, email, password})
+            })
+            .then(async (res)=>{
+                const data = await res.json();
+                if(!res.ok || !data.success){
+                    message.style.color = 'red';
+                    message.textContent = data.message || 'Signup failed.';
+                } else {
+                    message.style.color = 'green';
+                    message.textContent = data.message;
+                    // Redirect to index.html after 1 second
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1000);
+                }
+            })
+            .catch(err => {
+                console.error("Fetch error:", err);
+                message.style.color = 'red';
+                message.textContent = 'An error occurred during signup: ' + err.message;
+            });
         });
 
         document.getElementById('password').addEventListener('focus', function () {

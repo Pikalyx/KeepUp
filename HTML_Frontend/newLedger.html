@@ -1,0 +1,382 @@
+<!-- Template and minor debugging provided by ChatGPT, tweaked by developer. -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Multi-Account General Ledger — Template</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#fff; --accent:#2563eb; --muted:#6b7280;
+    --success:#059669; --danger:#dc2626;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:linear-gradient(180deg,#eef2ff 0,#f6f8fb 100%);display:flex;gap:18px;padding:20px;box-sizing:border-box}
+  .app{display:flex;flex:1;gap:18px;min-height:500px}
+  .sidebar{width:300px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);}
+  .main{flex:1;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);overflow:auto;}
+  h2{margin:0 0 10px 0;font-size:18px}
+  .account-list{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;padding-right:6px}
+  .account-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;cursor:pointer}
+  .account-item button{background:transparent;border:0;color:var(--muted);cursor:pointer}
+  .account-item.active{background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.02));}
+  .controls{display:flex;gap:8px;margin-bottom:10px}
+  button.primary{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid #e6e9ef;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .ledger-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .ledger-table{width:100%;border-collapse:collapse}
+  .ledger-table th, .ledger-table td{padding:8px;border-bottom:1px solid #eef2ff;text-align:left;font-size:14px}
+  .ledger-table th{background:transparent;color:var(--muted);font-weight:600}
+  .text-right{text-align:right}
+  .small{font-size:13px;color:var(--muted)}
+  .form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  input[type="text"], input[type="date"], input[type="number"], select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;background:white;min-width:0}
+  .actions{display:flex;gap:8px;align-items:center}
+  .bal-pos{font-weight:700}
+  .export{background:#111827;color:white;padding:6px 10px;border-radius:8px;border:0;cursor:pointer}
+  .muted{color:var(--muted)}
+  footer.note{margin-top:14px;color:var(--muted);font-size:13px}
+  @media (max-width:900px){
+    body{padding:12px}
+    .sidebar{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="General Ledger">
+  <aside class="sidebar" aria-label="Accounts sidebar">
+    <h2>Accounts</h2>
+    <div class="controls">
+      <button class="primary" id="createAccountBtn">+ Add Account</button>
+
+    </div>
+
+    <div class="account-list" id="accountsList" aria-live="polite"></div>
+
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <button class="ghost" id="renameAccountBtn">Rename</button>
+      <button class="ghost" id="deleteAccountBtn">Delete</button>
+      <button class="ghost" id="exportAllBtn">Export All CSV</button>
+      
+    </div>
+
+    <footer class="note">Tip: Use the "Add Entry" form in main area to record debits/credits per account.</footer>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="ledger-header">
+      <div>
+        <h2 id="ledgerTitle">Select an account</h2>
+        <div class="small" id="ledgerSubtitle">No account selected</div>
+      </div>
+
+      <div class="actions">
+        <select id="accountFilter" style="min-width:160px"></select>
+        <button class="primary" id="addEntryToggle">Add Entry</button>
+        <button class="export" id="exportAccountBtn" title="Export current account to CSV">Export CSV</button>
+      </div>
+    </div>
+
+    <section id="addEntrySection" style="display:none;margin-bottom:12px">
+      <div style="background:#f8fafc;border-radius:10px;padding:12px">
+        <form id="entryForm" onsubmit="return false">
+          <div class="form-row">
+            <input type="date" id="entryDate" required />
+            <input type="text" id="entryDescription" placeholder="Description" style="flex:1" required />
+            <select id="entryAccountSelect" required></select>
+            <input type="number" id="entryDebit" min="0" step="0.01" placeholder="Debit" />
+            <input type="number" id="entryCredit" min="0" step="0.01" placeholder="Credit" />
+            <button class="primary" id="saveEntryBtn">Save</button>
+            <button class="ghost" id="clearEntryBtn" type="button">Clear</button>
+          </div>
+          <div class="small muted">Enter an amount in either Debit or Credit (not both). For split transactions, enter multiple lines (one per affected account).</div>
+        </form>
+      </div>
+    </section>
+
+    <section id="ledgerSection" aria-live="polite">
+      <table class="ledger-table" id="ledgerTable" role="table" aria-label="Ledger">
+        <thead>
+          <tr>
+            <th style="width:120px">Date</th>
+            <th style="width:250px">Description</th>
+            <th style="width:140px">Debit</th>
+            <th style="width:140px">Credit</th>
+            <th style="width:140px" class="text-right">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody">
+          <tr><td colspan="5" class="small muted">No account selected</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<script>
+/* Database ledger (connected to Node backend) */
+
+// Helper shortcuts
+function $id(id){ return document.getElementById(id); }
+function money(v){ return Number(v).toLocaleString(undefined, {minimumFractionDigits:2}); }
+
+// Frontend state
+let accounts = [];
+let selectedAccountId = null;
+
+/* API CALLS*/
+
+// Load all accounts from DB
+async function loadAccounts() {
+  accounts = await fetch("/accounts").then(r => r.json());
+  if (accounts.length > 0 && !selectedAccountId) {
+    selectedAccountId = accounts[0].id;
+  }
+  renderAll();
+}
+
+// Create account → DB
+async function createAccount(name) {
+  const res = await fetch("/accounts", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name })
+  });
+  return res.json();
+}
+
+// Rename account → DB
+async function renameAccountRequest(id, newName) {
+  await fetch(`/accounts/${id}`, {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ newName })
+  });
+}
+
+// Delete account → DB
+async function deleteAccountRequest(id) {
+  await fetch(`/accounts/${id}`, { method: "DELETE" });
+}
+
+// Load entries for an account
+async function loadEntries(accountId) {
+  return await fetch(`/entries/${accountId}`).then(r => r.json());
+}
+
+// Add entry → DB
+async function addEntryRequest(entry) {
+  const res = await fetch("/entries", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(entry)
+  });
+  return res.json();
+}
+
+/* FRONTEND RENDERING*/
+
+async function renderAll() {
+  renderAccountsList();
+  renderAccountSelects();
+  await renderLedger();
+}
+
+// Sidebar list of accounts
+function renderAccountsList() {
+  const container = $id("accountsList");
+  container.innerHTML = "";
+
+  accounts.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "account-item" + (a.id === selectedAccountId ? " active" : "");
+    div.dataset.id = a.id;
+
+    div.onclick = () => {
+      selectedAccountId = a.id;
+      renderAll();
+    };
+
+    let balancePreview = "0.00"; // will update later after entries load
+    const left = document.createElement("div");
+    left.style.display = "flex";
+    left.style.flexDirection = "column";
+
+    const title = document.createElement("div");
+    title.textContent = a.name;
+    title.style.fontWeight = 600;
+
+    const sub = document.createElement("div");
+    sub.className = "small muted";
+    sub.textContent = "Loading...";
+
+    left.appendChild(title);
+    left.appendChild(sub);
+
+    const right = document.createElement("div");
+    const balEl = document.createElement("div");
+    balEl.className = "small";
+    balEl.textContent = balancePreview;
+
+    right.appendChild(balEl);
+
+    div.appendChild(left);
+    div.appendChild(right);
+
+    container.appendChild(div);
+
+    // Load entries to calculate preview balance
+    loadEntries(a.id).then(entries => {
+      let bal = 0;
+      entries.forEach(e => bal += (e.debit - e.credit));
+      sub.textContent = `${entries.length} entries`;
+      balEl.innerHTML = `<span class="bal-pos">${money(bal)}</span>`;
+    });
+  });
+}
+
+function renderAccountSelects() {
+  const sel = $id("entryAccountSelect");
+  const filter = $id("accountFilter");
+
+  sel.innerHTML = "";
+  filter.innerHTML = "";
+
+  accounts.forEach(a => {
+    let opt = document.createElement("option");
+    opt.value = a.id;
+    opt.textContent = a.name;
+    sel.appendChild(opt);
+
+    let opt2 = opt.cloneNode(true);
+    filter.appendChild(opt2);
+  });
+
+  if (selectedAccountId) {
+    sel.value = selectedAccountId;
+    filter.value = selectedAccountId;
+  }
+}
+
+// Render main ledger
+async function renderLedger() {
+  const titleEl = $id("ledgerTitle");
+  const subEl = $id("ledgerSubtitle");
+  const tbody = $id("ledgerBody");
+  tbody.innerHTML = "";
+
+  if (!selectedAccountId) {
+    titleEl.textContent = "Select an account";
+    subEl.textContent = "No account selected";
+    tbody.innerHTML = `<tr><td colspan="5" class="small muted">No account selected</td></tr>`;
+    return;
+  }
+
+  const a = accounts.find(acc => acc.id === selectedAccountId);
+  titleEl.textContent = a.name;
+
+  const entries = await loadEntries(selectedAccountId);
+  subEl.textContent = `${entries.length} entries`;
+
+  if (entries.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="small muted">No entries yet for ${a.name}</td></tr>`;
+    return;
+  }
+
+  let bal = 0;
+  entries.forEach(e => {
+    bal += (e.debit - e.credit);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.description}</td>
+      <td>${e.debit ? money(e.debit) : ""}</td>
+      <td>${e.credit ? money(e.credit) : ""}</td>
+      <td class="text-right">${money(bal)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* UI HANDLERS*/
+
+
+// Create new account
+$id("createAccountBtn").onclick = async () => {
+  const name = prompt("Enter new account name:");
+  if (!name || !name.trim()) return;
+
+  const newAcc = await createAccount(name.trim());
+
+  // Select the new account by default
+  if (newAcc && newAcc.id) {
+    selectedAccountId = newAcc.id;
+  }
+
+  await loadAccounts();
+};
+
+
+// Rename account
+$id("renameAccountBtn").onclick = async () => {
+  if (!selectedAccountId) return alert("Select an account first.");
+  const a = accounts.find(acc => acc.id === selectedAccountId);
+  const newName = prompt("Rename account:", a.name);
+  if (newName) {
+    await renameAccountRequest(a.id, newName.trim());
+    await loadAccounts();
+  }
+};
+
+// Delete account
+$id("deleteAccountBtn").onclick = async () => {
+  if (!selectedAccountId) return alert("Select an account first.");
+  if (!confirm("Are you sure you want to delete this account?")) return;
+  await deleteAccountRequest(selectedAccountId);
+  selectedAccountId = null;
+  await loadAccounts();
+};
+
+// Add entry
+$id("saveEntryBtn").onclick = async () => {
+  const date = $id("entryDate").value;
+  const desc = $id("entryDescription").value.trim();
+  const accountId = Number($id("entryAccountSelect").value);
+  const debit = Number($id("entryDebit").value) || 0;
+  const credit = Number($id("entryCredit").value) || 0;
+
+  if (!accountId) return alert("Choose an account.");
+  if (!date) return alert("Enter date.");
+  if (!desc) return alert("Enter description.");
+  if (debit === 0 && credit === 0) return alert("Enter a debit or credit.");
+
+  await addEntryRequest({ accountId, date, desc, debit, credit });
+
+  $id("entryDate").value = "";
+  $id("entryDescription").value = "";
+  $id("entryDebit").value = "";
+  $id("entryCredit").value = "";
+
+  await renderAll();
+};
+
+// Filter accounts
+$id("accountFilter").onchange = e => {
+  selectedAccountId = Number(e.target.value);
+  renderAll();
+};
+
+// Toggle entry form
+$id("addEntryToggle").onclick = () => {
+  const sec = $id("addEntrySection");
+  sec.style.display = sec.style.display === "none" ? "block" : "none";
+};
+
+
+/* INITIAL LOAD*/
+loadAccounts();
+</script>
+
+</body>
+</html>
