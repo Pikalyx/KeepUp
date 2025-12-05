@@ -57,13 +57,14 @@ function createDefaultAccountsForUser(userId) {
             "Service Revenue"
         ];
 
-        const sql = `INSERT INTO accounts (name, user_id) VALUES (? ,?)`;
+        const sql = `INSERT INTO accounts (name, user_id) VALUES (?, ?)`;
         let completed = 0;
         let hasError = false;
         
         defaultAccounts.forEach((name) => {
             db.run(sql, [name, userId], (err) => {
                 if (err && !hasError) {
+                    console.error(`Error inserting account "${name}":`, err);
                     hasError = true;
                     return reject(err);
                 }

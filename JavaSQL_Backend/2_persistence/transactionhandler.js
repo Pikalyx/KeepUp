@@ -3,10 +3,10 @@ const db = require("../3_config/db");
 //  ACCOUNTS 
 
 // Get all accounts
-exports.getAllAccounts = () => {
+exports.getAllAccounts = (userId) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM accounts WHERE user_id = ? ORDER BY id ASC`;
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [userId], (err, rows) => {
       if (err) return reject(err);
       resolve(rows);
     });
