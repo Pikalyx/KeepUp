@@ -5,8 +5,13 @@ async function signup(req, res) {
     const { username, email, password } = req.body;
     
     try {
-        await authService.signup(username, email, password);
-        res.json({ success: true, message: "Signup successful!" });
+        const userId = await authService.signup(username, email, password);
+        
+        // Auto-login after successful signup
+        const user = { id: userId, username, email };
+        req.session.user = user;
+        
+        res.json({ success: true, message: "Signup successful!", user });
     } catch (err) {
         console.error("Signup error:", err);
         res.status(400).json({ success: false, message: "Signup failed: " + err.message });
