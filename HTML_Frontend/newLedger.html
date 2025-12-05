@@ -36,17 +36,38 @@
   .export{background:#111827;color:white;padding:6px 10px;border-radius:8px;border:0;cursor:pointer}
   .muted{color:var(--muted)}
   footer.note{margin-top:14px;color:var(--muted);font-size:13px}
+
+  header {
+  display: flex;
+  justify-content: space-between; /* button left, image centered with trick below */
+  align-items: center;
+  position: relative;
+}
+
+header img {
+  height: 220px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 10px; /* Add space under the image */
+}
+
   @media (max-width:900px){
     body{padding:12px}
     .sidebar{display:none}
   }
 </style>
+
 </head>
+
+
 <body>
+  
 <div class="app" role="application" aria-label="General Ledger">
   <aside class="sidebar" aria-label="Accounts sidebar">
     <h2>Accounts</h2>
     <div class="controls">
+      <button class="primary" onclick="navigate('index.html')">Home</button>
       <button class="primary" id="createAccountBtn">+ Add Account</button>
 
     </div>
@@ -372,6 +393,9 @@ $id("addEntryToggle").onclick = () => {
   const sec = $id("addEntrySection");
   sec.style.display = sec.style.display === "none" ? "block" : "none";
 };
+
+  function navigate(url) {
+    window.location.href = url;}
 
 
 /* INITIAL LOAD*/
