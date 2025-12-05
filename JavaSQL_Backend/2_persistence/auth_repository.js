@@ -14,21 +14,21 @@ function createUser(username, email, passwordHash) {
     });
 }
 
-function createDefaultAccount(userId) {
-    return new Promise((resolve, reject) => {
-        const sql = `
-            INSERT INTO accounts (user_id, name)
-            VALUES (?, 'Main Account')
-        `;
+// function createDefaultAccount(userId) {
+//     return new Promise((resolve, reject) => {
+//         const sql = `
+//             INSERT INTO accounts (user_id, name)
+//             VALUES (?, 'Main Account')
+//         `;
 
-        db.run(sql, [userId], (err) => {
-            if (err) reject(err);
-            else resolve();
-        });
-    });
-}
+//         db.run(sql, [userId], (err) => {
+//             if (err) reject(err);
+//             else resolve();
+//         });
+//     });
+// }
 
-module.exports = { createUser, createDefaultAccount };
+module.exports = { createUser, createDefaultAccountsForUser };
 
 function findUserByEmail(email) {
     return new Promise((resolve, reject) => {
@@ -40,5 +40,42 @@ function findUserByEmail(email) {
     });
 }
 
+function createDefaultAccountsForUser(userId) {
+    return new Promise((resolve, reject) => {
+        const defaultAccounts = [
+            "Cash",
+            "Accounts Receivable",
+            "Inventory",
+            "Accounts Payable",
+            "Common Stock",
+            "Retained Earnings",
+            "Rent Expense",
+            "Payroll Expense",
+            "Supplies Expense",
+            "Cost of Goods Sold",
+            "Sales Revenue",
+            "Service Revenue"
+        ];
+
+        const sql = `INSERT INTO accounts (name, user_id) VALUES (? ,?)`;
+        let completed = 0;
+        let hasError = false;
+        
+        defaultAccounts.forEach((name) => {
+            db.run(sql, [name, userId], (err) => {
+                if (err && !hasError) {
+                    hasError = true;
+                    return reject(err);
+                }
+                completed++;
+                if (completed === defaultAccounts.length && !hasError){
+                    resolve();
+                }
+            });
+        });
+    });
+
+}
+
 // export additional function
-module.exports = { createUser, createDefaultAccount, findUserByEmail };
+module.exports = { createUser, findUserByEmail, createDefaultAccountsForUser };

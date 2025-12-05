@@ -33,11 +33,11 @@ function initializeSchema() {
       console.log(" Database initialized with schema.sql");
       // Ensure any required migrations are applied for existing DBs
       ensureUsernameColumn()
-        .then(() => seedDefaultAccounts())
+        .then(() => {
+          console.log(' Database setup complete');
+        })
         .catch((e) => {
           console.error(' Migration error:', e && e.message ? e.message : e);
-          // Still attempt to seed accounts even if migration fails (SUGGESTED BY Co-pilot)
-          seedDefaultAccounts();
         });
     }
   });
@@ -66,50 +66,46 @@ function ensureUsernameColumn() {
   });
 }
 
-//(until here)
+// // Create default accounts if table is empty (Commented out for now, testing new changes)
+// function seedDefaultAccounts() {
+//   const defaultAccounts = [
+//     "Cash",
+//     "Accounts Receivable",
+//     "Inventory",
+//     "Accounts Payable",
+//     "Common Stock",
+//     "Retained Earnings",
+//     "Rent Expense",
+//     "Payroll Expense",
+//     "Supplies Expense",
+//     "Cost of Goods Sold",
+//     "Sales Revenue",
+//     "Service Revenue"
+//   ];
 
-// Create default accounts if table is empty
-function seedDefaultAccounts() {
-  const defaultAccounts = [
-    "Cash",
-    "Accounts Receivable",
-    "Inventory",
-    "Accounts Payable",
-    "Common Stock",
-    "Retained Earnings",
-    "Rent Expense",
-    "Payroll Expense",
-    "Supplies Expense",
-    "Cost of Goods Sold",
-    "Sales Revenue",
-    "Service Revenue"
-  ];
+  // db.get("SELECT COUNT(*) AS count FROM accounts", (err, row) => {
+  //   if (err) {
+  //     console.error(" Error checking accounts table:", err.message);
+  //     return;
+  //   }
 
-  db.get("SELECT COUNT(*) AS count FROM accounts", (err, row) => {
-    if (err) {
-      console.error(" Error checking accounts table:", err.message);
-      return;
-    }
+  //   if (row.count > 0) {
+  //     console.log(" Default accounts already exist, skipping seeding.");
+  //     return;
+  //   }
 
-    if (row.count > 0) {
-      console.log(" Default accounts already exist, skipping seeding.");
-      return;
-    }
+  //   console.log(" Seeding default chart of accounts...");
 
-    console.log(" Seeding default chart of accounts...");
+  //   const insertSQL = `INSERT INTO accounts (name, user_id) VALUES (?, ?)`;
 
-    const insertSQL = `INSERT INTO accounts (name) VALUES (?)`;
+  //   defaultAccounts.forEach((name, userId) => {
+  //     db.run(insertSQL, [name, userId], (err) => {
+  //       if (err) console.error("Error inserting account:", name, userId, err.message);
+  //     });
+  //   });
 
-    defaultAccounts.forEach((name) => {
-      db.run(insertSQL, [name], (err) => {
-        if (err) console.error("Error inserting account:", name, err.message);
-      });
-    });
-
-    console.log(" Default accounts created.");
-  });
-}
-
+  //   console.log(" Default accounts created.");
+  // });
 
 
 module.exports = db;

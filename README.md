@@ -35,6 +35,7 @@ Team Members: Julie Amon, Noah Gillespie, Joe Morton, and Bryson Perryman
    npm install
    npm install sqlite3
    npm install bcrypt
+   npm install express-session
    ```
 
 3. Run the Server

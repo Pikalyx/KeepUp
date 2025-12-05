@@ -7,8 +7,8 @@ async function signup(username, email, password) {
     // Insert user record
     const userId = await authRepo.createUser(username, email, hash);
 
-    // Create a default account for this user
-    await authRepo.createDefaultAccount(userId);
+    // Create a default account for this user with default accounts
+    await authRepo.createDefaultAccountsForUser(userId);
 
     return userId;
 }
