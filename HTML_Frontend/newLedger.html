@@ -7,11 +7,11 @@
 <title>Multi-Account General Ledger — Template</title>
 <style>
   :root{
-    --bg:#f6f8fb; --card:#fff; --accent:#2563eb; --muted:#6b7280;
+    --bg:#f6f8fb; --card:#fff; --accent:#4CAF50; --muted:#6b7280;
     --success:#059669; --danger:#dc2626;
   }
   html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  body{background:linear-gradient(180deg,#eef2ff 0,#f6f8fb 100%);display:flex;gap:18px;padding:20px;box-sizing:border-box}
+  body{background:linear-gradient(180deg,#ecfdf2 0,#f6f8fb 100%);display:flex;gap:18px;padding:20px;box-sizing:border-box}
   .app{display:flex;flex:1;gap:18px;min-height:500px}
   .sidebar{width:300px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);}
   .main{flex:1;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);overflow:auto;}
@@ -19,7 +19,7 @@
   .account-list{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;padding-right:6px}
   .account-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;cursor:pointer}
   .account-item button{background:transparent;border:0;color:var(--muted);cursor:pointer}
-  .account-item.active{background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.02));}
+  .account-item.active{background:linear-gradient(90deg, rgba(105, 250, 126, 0.08), rgba(37,99,235,0.02));}
   .controls{display:flex;gap:8px;margin-bottom:10px}
   button.primary{background:var(--accent);color:white;padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
   button.ghost{background:transparent;border:1px solid #e6e9ef;padding:8px 10px;border-radius:8px;cursor:pointer}
@@ -36,17 +36,38 @@
   .export{background:#111827;color:white;padding:6px 10px;border-radius:8px;border:0;cursor:pointer}
   .muted{color:var(--muted)}
   footer.note{margin-top:14px;color:var(--muted);font-size:13px}
+
+  header {
+  display: flex;
+  justify-content: space-between; /* button left, image centered with trick below */
+  align-items: center;
+  position: relative;
+}
+
+header img {
+  height: 220px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 10px; /* Add space under the image */
+}
+
   @media (max-width:900px){
     body{padding:12px}
     .sidebar{display:none}
   }
 </style>
+
 </head>
+
+
 <body>
+  
 <div class="app" role="application" aria-label="General Ledger">
   <aside class="sidebar" aria-label="Accounts sidebar">
     <h2>Accounts</h2>
     <div class="controls">
+      <button class="primary" onclick="navigate('index.html')">Home</button>
       <button class="primary" id="createAccountBtn">+ Add Account</button>
 
     </div>
@@ -372,6 +393,9 @@ $id("addEntryToggle").onclick = () => {
   const sec = $id("addEntrySection");
   sec.style.display = sec.style.display === "none" ? "block" : "none";
 };
+
+  function navigate(url) {
+    window.location.href = url;}
 
 
 /* INITIAL LOAD*/

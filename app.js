@@ -4,6 +4,7 @@ console.log(">>> RUNNING APP FILE:", __filename);
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
 
 // Import Controller
 const transactionController = require("./JavaSQL_Backend/0_Presentation/transaction_controller");
@@ -19,7 +20,16 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Log every incoming request for debugging (method + path) (Done by VS Co-pilot)
+app.use(session({
+  secret: 'circular-squares-secret-key',
+  resave:false,
+  saveUninitialized:true,
+  cookie: { secure: false, maxAge: 24*60*60*1000 } // Set to true if using HTTPS (Suggested by Co-pilot)
+}))
+
+
+
+// Log every incoming request for debugging (method + path) (Done by Co-pilot)
 app.use((req, res, next) => {
   console.log(`>>> REQ ${req.method} ${req.path}`);
   next();
@@ -43,17 +53,24 @@ app.post("/signin", (req, res, next) => {
 
 console.log("AUTH CONTROLLER:", authController);
 
+//Authentication middleware for user routes
+function requireAuth(req, res, next) {
+  if(!req.session.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+
+  }next();
+}
+
 
 //API Routes
 
-app.get("/accounts", transactionController.getAccounts);
-app.post("/accounts", transactionController.createAccount);
-app.put("/accounts/:id", transactionController.renameAccount);
-app.delete("/accounts/:id", transactionController.deleteAccount);
+app.get("/accounts", requireAuth,transactionController.getAccounts);
+app.post("/accounts", requireAuth,transactionController.createAccount);
+app.put("/accounts/:id",requireAuth, transactionController.renameAccount);
+app.delete("/accounts/:id",requireAuth, transactionController.deleteAccount);
 
-app.get("/entries/:accountId", transactionController.getEntries);
-app.post("/entries", transactionController.addEntry);
-
+app.get("/entries/:accountId", requireAuth,transactionController.getEntries);
+app.post("/entries", requireAuth,transactionController.addEntry);
 
 
 // Frontend Route 
@@ -74,7 +91,7 @@ app.get("/newLedger", (req, res) => {
 
 console.log(">>> /newLedger route registered");
 
-// Serve financial statements at /statements.html
+// Route for financial statements using /statements.html
 app.get("/statements.html", (req, res) => {
   console.log(">>> /statements.html route WAS HIT");
   

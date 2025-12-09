@@ -5,7 +5,7 @@ const transactionService = require("../1_business/business_calculations");
 // GET /accounts
 async function getAccounts(req, res) {
   try {
-    const accounts = await transactionService.getAllAccounts();
+    const accounts = await transactionService.getAllAccounts(req.session.user.id);
     res.json(accounts);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -15,7 +15,7 @@ async function getAccounts(req, res) {
 // POST /accounts
 async function createAccount(req, res) {
   try {
-    const newAccount = await transactionService.createAccount(req.body.name);
+    const newAccount = await transactionService.createAccount(req.body.name, req.seesion.user.id);
     res.json(newAccount);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -27,7 +27,8 @@ async function renameAccount(req, res) {
   try {
     const updated = await transactionService.renameAccount(
       req.params.id,
-      req.body.newName
+      req.body.newName,
+      req.session.user.id
     );
     res.json(updated);
   } catch (err) {
@@ -38,7 +39,7 @@ async function renameAccount(req, res) {
 // DELETE /accounts/:id
 async function deleteAccount(req, res) {
   try {
-    await transactionService.deleteAccount(req.params.id);
+    await transactionService.deleteAccount(req.params.id, req.session.user.id);
     res.json({ success: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -50,7 +51,7 @@ async function deleteAccount(req, res) {
 // GET /entries/:accountId
 async function getEntries(req, res) {
   try {
-    const entries = await transactionService.getEntries(req.params.accountId);
+    const entries = await transactionService.getEntries(req.params.accountId, req.session.user.id);
     res.json(entries);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -60,7 +61,7 @@ async function getEntries(req, res) {
 // POST /entries
 async function addEntry(req, res) {
   try {
-    const savedEntry = await transactionService.addEntry(req.body);
+    const savedEntry = await transactionService.addEntry(req.body, req.session.user.id);
     res.json(savedEntry);
   } catch (err) {
     res.status(400).json({ error: err.message });

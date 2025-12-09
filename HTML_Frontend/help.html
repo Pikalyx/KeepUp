@@ -5,63 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple Webpage</title>
   <style>
-    /* Basic reset */
-    body, h1, p {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+/* Modern Reset */
+body, h1, h2, h3, p, li {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, Arial, sans-serif;
+}
 
-    /* Body styling */
-    body {
-      background-color: #f9f9f9;
-      padding: 20px;
-      line-height: 1.6;
-    }
+/* Overall page */
+body {
+  background: #f5f7fa;
+  padding: 40px;
+  line-height: 1.65;
+  color: #333;
+}
 
-    /* Container for text content */
-    .content {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: rgb(190, 255, 177);
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgb(0, 0, 0);
-    }
+/* Logo top-left */
+.image {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 90px;
+  opacity: 0.9;
+  transition: 0.2s;
+}
 
-    /* Picture styling in the top-left corner */
-    .image {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 100px; /* Adjust size of image */
-      height: auto;
-    }
+.image:hover {
+  opacity: 1;
+}
 
-    /* Heading and paragraph styling */
-    h1 {
-      color: #333;
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
+/* Main content card */
+.content {
+  max-width: 850px;
+  margin: 80px auto;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(203, 243, 240);
+}
 
-    h2 {
-      color: #333;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
+/* Headings */
+h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+  color: #222;
+}
 
-    h3 {
-      color: #333;
-      font-size: 1.25rem;
-      margin-bottom: 20px;
-    }
+h2 {
+  margin-top: 40px;
+  font-size: 1.5rem;
+  color: #4CAF51;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+}
 
-    p {
-      color: #333;
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
+h3 {
+  font-size: 1.1rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #4a5568;
+}
+
+/* Paragraphs & list items */
+p, li {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: #444;
+}
+
+/*  list */
+li {
+  margin-left: 20px;
+  line-height: 1.6;
+}
+
   </style>
 </head>
 <body>

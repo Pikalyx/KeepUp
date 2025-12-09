@@ -1,8 +1,9 @@
--- Account  (MULTI-ACCOUNT LEDGER)
+-- Account  (Multi-Account Ledger)
 CREATE TABLE IF NOT EXISTS accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    name TEXT NOT NULL
+    user_id INTEGER NOT NULL,  -- Make NOT NULL since every account should have an owner
+    name TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Users 
