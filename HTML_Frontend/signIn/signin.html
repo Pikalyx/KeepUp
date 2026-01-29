@@ -51,7 +51,7 @@
         } else {
           message.style.color = 'green';
           message.textContent = data.message || 'Signin successful';
-          setTimeout(() => { window.location.href = '/index.html'; }, 700);
+          setTimeout(() => { window.location.href = '../index.html'; }, 700);
         }
       } catch (err) {
         console.error('Signin fetch error', err);
